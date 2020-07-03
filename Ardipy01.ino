@@ -2,9 +2,9 @@
 
 #define DEBUG_FLAG false
 //#define BAUDRATE 9600
-#define BAUDRATE 460800
+#define BAUDRATE 921600
 
-const char* Version = "1.0";
+const char* Version = "1.0!!"; //5 charactor
 
 void debug_print(char* data)
 {
@@ -74,18 +74,18 @@ int input_count=0;
 
 // Format:
 // I2R(Read I2C):38(SlaveAddress(HEX)):01(Registor):0 (文字数 1:1byte 2:2byte)!(終端文字)
-//     -> (1byte)3byte return
+//     -> (1byte)5byte return
 //     -> (2byte)5byte return
 // I2W(Write I2C):38(SlaveAddress(HEX)):01(Registor):FF(data):0 (文字数 0:1byte 2:2byte)!(終端文字)
-//     -> 1byte return
+//     -> 5byte return
 // POW(write port):00(port No):1or0(Port Data)!(終端文字)  
-//     -> 1byte return
+//     -> 5byte return
 // POR(read port):00(port No)!(終端文字)                   
-//     -> 2byte return
+//     -> 5byte return
 // ADR(Read AD Data):00(AD port No)!(終端文字)
-//     -> 4byte return
+//     -> 5byte return
 // VER(version)!(終端文字)
-//     -> 4byte return
+//     -> 5byte return
 
 void loop() {
   char *lexeme;
@@ -117,7 +117,7 @@ void loop() {
           unsigned char retb = readRegister_byte(atoi16(str[1]), atoi16(str[2]));
           sprintf( buff, "SlaveAddr=%x : Registor=%x", atoi16(str[1]), atoi16(str[2]) );
           debug_print(buff);
-          sprintf(rets, "%02x!", retb); 
+          sprintf(rets, "%02x!!!", retb); 
           Serial.print(rets);
         }else{
           unsigned long retw = (unsigned short)readRegister_word(atoi16(str[1]), atoi16(str[2]));                  
@@ -131,7 +131,7 @@ void loop() {
         debug_print("Write I2C");       
         if( atoi(str[4]) == 1){
           writeRegister_byte(atoi16(str[1]), atoi16(str[2]), atoi16(str[3]));
-          Serial.print("!");
+          Serial.print("!!!!!");
           if(DEBUG_FLAG){
             unsigned char retb = readRegister_byte(atoi16(str[1]), atoi16(str[2]));
             sprintf(rets, "Check Read data =%x", retb); 
@@ -152,34 +152,33 @@ void loop() {
          writeRegister_byte(atoi16(str[1]), atoi16(str[2]), atoi16(str[3]));
          digitalWrite(atoi16(str[1]), atoi16(str[2]));
          debug_print("port out");
-         Serial.print("!");
+         Serial.print("!!!!!");
       }
 
       else if(strcmp( str[0], "POW")==0){
          pinMode(atoi16(str[1]), OUTPUT);
          digitalWrite(atoi16(str[1]), atoi16(str[2]));
          debug_print("port out");
-         Serial.print("!");
+         Serial.print("!!!!!");
       }
       else if(strcmp( str[0], "POR")==0){
          pinMode(atoi16(str[1]), INPUT);
          unsigned char retb = digitalRead(atoi16(str[1]));
-         sprintf(rets, "%01x!", retb); 
+         sprintf(rets, "%01x!!!!", retb); 
          Serial.print(rets);
       }
       else if(strcmp( str[0], "ADR")==0){
          pinMode(atoi16(str[1]), INPUT);
          word retw = analogRead(atoi16(str[1]));
-         sprintf(rets, "%03x!", retw); 
+         sprintf(rets, "%03x!!", retw); 
          Serial.print(rets);
       }
       else if(strcmp( str[0], "VER")==0){
         Serial.print(Version);
-        Serial.print("!");
       }
 
       else {
-        Serial.println("-");        
+        Serial.print("----!");        
       }
     }
     else { input_count++; }

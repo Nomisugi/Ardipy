@@ -1,0 +1,2 @@
+I2CRegisterEditor Ver1.0
+tkinterで作る初めてのGUIです。tkinterは使いづらいので苦労しています。

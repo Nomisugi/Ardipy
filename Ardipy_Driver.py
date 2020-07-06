@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @file Arduino_Driver01.py
-@version 1.0
+@version 1.1
 @author NSugi
 @date 06/26/2020
 @brief 
@@ -32,7 +32,7 @@ class Ardipy:
         self.log = log
         self.ser = serial.Serial()
         self.ser.baudrate = 921600
-        
+        self.connect_flag = False
     #==========================================================================
     # MAIN PROGRAM
     #==========================================================================
@@ -52,6 +52,7 @@ class Ardipy:
         #Version Check
         if( self.versionCheck() == False ):
             raise ConnectException()
+        self.connect_flag = True
         return com_str
 
     def connect(self, comm_num):
@@ -63,17 +64,20 @@ class Ardipy:
         time.sleep(2)
         if( ar.versionCheck() == False ):
             raise ConnectException()
+        self.connect_flag = True
+
 
     def disconnect(self):
         self.ser.close()
+        self.connect_flag = False
 
     def reset(self):
         self.ser.write(str.encode("!"))
         data = self.ser.read(5)
         
-    def i2cWrite(self, slave_addr, addr, data):
-        str = "I2W:%02x:%02x:%02x:1!" % (slave_addr, addr, data)
-        self.ser.write(str)
+    def i2cWrite(self, slave_addr, addr, val):
+        data = "I2W:%02x:%02x:%02x:1!" % (slave_addr, addr, val)
+        self.ser.write(str.encode(data))
         str = self.ser.read(5)
         if( str.decode('utf-8') != '----!'):
             return True
@@ -81,23 +85,25 @@ class Ardipy:
             return False
 
     def i2cRead(self, slave_addr, addr):
-        data = "I2R:%02x:%02x!:1" % (slave_addr, addr)
+        data = "I2R:%02x:%02x:1!" % (slave_addr, addr)
         self.ser.write(str.encode(data))
         data = self.ser.read(1)
         n = self.ser.inWaiting()
-        if n: data = data + ser.read(n)
+        if n: data = data + self.ser.read(n)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
         return int(data3, 16)
 
-    def i2cWrite_word(self, slave_addr, addr, data):
-        str = "I2W:%02x:%02x:%02x:2!" % (slave_addr, addr, data)
-        self.ser.write(str)
-        str = self.ser.read(5)
-        if( str.decode('utf-8') != '----!'):
-            return True
-        else:
-            return False
+    def i2cWrite_word(self, slave_addr, addr, val):
+        data = "I2W:%02x:%02x:%02x:2!" % (slave_addr, addr, val)
+        print(data)
+        self.ser.write(str.encode(data))
+        data = self.ser.read(1)
+        n = self.ser.inWaiting()
+        if n: data = data + self.ser.read(n)
+        data2 = data.decode('utf-8')
+        print(data2)
+        
 
     def i2cRead_word(self, slave_addr, addr):
         data = "I2R:%02x:%02x:2!" % (slave_addr, addr)
@@ -120,7 +126,6 @@ class Ardipy:
     def versionCheck(self):
         self.ser.write(str.encode('VER!'))
         data = self.ser.read(5)
-#        sdata = self.readline()
         sdata = data.decode('utf-8')
 
         if(sdata.split('.')[0] != Arduino_FW_Version.split('.')[0] ):
@@ -132,6 +137,10 @@ class Ardipy:
 
     def power(self, flag):
         print("power")
+
+    def isConnect(self):
+        return self.connect_flag
+                
 
     def test(self):
         print("test")

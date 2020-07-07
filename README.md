@@ -19,3 +19,10 @@ UART, I2Cなどの速度設定は固定(pymate, frmateなどの使用も検討�
 SPI, PWMなどは未実装<BR>
 I2CRegister : writeデータのセーブロード未実装<BR>
 I2CRegister : Deviceの切り替え方法など検討中<BR>
+
+---Pymate, Frmate対応----<BR>
+  Pymateは色々なことが出来すぎるので、小難しくなっているため<BR>
+  Ardipyは簡潔な通信を目指します。<BR>
+  そのため、細かい設定(I2C速度変更、ADポート設定ON/OFF)は出省きます。<BR>
+  どうしても細かい設定をしたい場合は、Pymateを使うか、Ardino側のプログラムを<BR>
+  弄るなどして、対応した方が早いです。<BR>

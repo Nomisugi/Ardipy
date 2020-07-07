@@ -13,7 +13,6 @@ ArduinoをAardvarkのようなI2CとPythonのインターフェースとして�
 HexSpinbox (Tkinter用 hex spinbox) <BR>
 LogWindow  (Tkinter用 log 出力窓) [準備中]<BR>
 <BR>
-  
 ---現状の問題点・課題点---<BR>
 UART, I2Cなどの速度設定は固定(pymate, frmateなどの使用も検討中)<BR>
 SPI, PWMなどは未実装<BR>

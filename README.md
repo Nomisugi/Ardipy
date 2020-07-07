@@ -9,14 +9,13 @@ ArduinoをAardvarkのようなI2CとPythonのインターフェースとして�
 4. Ardipy_ADGraph.py       Ardipy : Python3サンプルソフト( ADC Graph viewer )  (動作確認用 (ADC1, ADC2のみチェック)
 5. Ardipy_PortControler.py Ardipy : Python3サンプルソフト( Port Controler )  [準備中]
 
--付属部品 <BR>
+---GUI付属部品--- <BR>
 HexSpinbox (Tkinter用 hex spinbox) <BR>
 LogWindow  (Tkinter用 log 出力窓) [準備中]<BR>
 <BR>
   
 現状の問題点・課題点
-UART, I2Cなどの速度設定は固定
+UART, I2Cなどの速度設定は固定(pymate, frmateなどの使用も検討中)
 SPI, PWMなどは未実装
-I2CRegister : Tkinter SpinboxがHEX未対応のため使いづらい
 I2CRegister : writeデータのセーブロード未実装
 I2CRegister : Deviceの切り替え方法など検討中

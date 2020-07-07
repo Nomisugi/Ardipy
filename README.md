@@ -14,13 +14,14 @@ HexSpinbox (Tkinter用 hex spinbox) <BR>
 LogWindow  (Tkinter用 log 出力窓) [準備中]<BR>
 <BR>
   
-現状の問題点・課題点<BR>
+---現状の問題点・課題点---<BR>
 UART, I2Cなどの速度設定は固定(pymate, frmateなどの使用も検討中)<BR>
 SPI, PWMなどは未実装<BR>
 I2CRegister : writeデータのセーブロード未実装<BR>
 I2CRegister : Deviceの切り替え方法など検討中<BR>
 
 ---Pymate, Frmate対応----<BR>
+  一応Pymateにも対応してみたいと思います<BR>
   Pymateは色々なことが出来すぎるので、小難しくなっているため<BR>
   Ardipyは簡潔な通信を目指します。<BR>
   そのため、細かい設定(I2C速度変更、ADポート設定ON/OFF)は出省きます。<BR>

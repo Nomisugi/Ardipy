@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @file Ardipy_I2CRegister.py
-@version 1.0
+@version 1.1
 @author NomiSugi
 @date 07/1/2020
 @brief 
@@ -19,6 +19,7 @@ import time
 import tkinter as tk
 sys.path.append('../')
 from Ardipy_Driver import Ardipy
+from HexSpinbox import *
 
 Ardipy_I2CRegister = "1.0"
 #Register_File = "I2CDevice_default.ini"
@@ -92,11 +93,14 @@ class I2C_register(tk.LabelFrame):
         read_label = tk.Label(self, textvariable = self.read_str)
         read_label.pack( side = 'left')
         
-        self.wtxt = tk.StringVar()
-        self.wtxt.set("0x00")
-        sp1 = tk.Spinbox(self,textvariable=self.wtxt,from_=0,to=255,
-                         increment=1, width=10)
-        sp1.pack(fill = 'x', padx=5, side = 'left')
+        if(self.word_num == 1):
+            self.sp1 = HexSpinboxChar(self,width=10)
+            self.sp1.set(0x00)
+        else:
+            self.sp1 = HexSpinboxWord(self,width=10)
+            self.sp1.set(0x0000)
+
+        self.sp1.pack(fill = 'x', padx=5, side = 'left')
 
         def read_button_on_click():
             self.read()
@@ -125,11 +129,10 @@ class I2C_register(tk.LabelFrame):
         return int(self.addr_txt.cget("text"), 16)
 
     def write(self):
-        print(int(self.wtxt.get()))
         if(self.word_num ==1 ):
-            self.ardipy.i2cWrite( self.slave_addr, self.addr, int(self.wtxt.get()))
+            self.ardipy.i2cWrite( self.slave_addr, self.addr, int(self.sp1.get()))
         else:
-            self.ardipy.i2cWrite_word( self.slave_addr, self.addr,int(self.wtxt.get()))
+            self.ardipy.i2cWrite_word( self.slave_addr, self.addr,int(self.sp1.get()))
 
     def setReadVal(self, val):
         if(self.word_num ==1 ):

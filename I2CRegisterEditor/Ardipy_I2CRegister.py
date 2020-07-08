@@ -22,8 +22,8 @@ from Ardipy_Driver import Ardipy
 from HexSpinbox import *
 
 Ardipy_I2CRegister = "1.0"
-#Register_File = "I2CDevice_default.ini"
-Register_File = "I2CDevice_INA226.ini"
+Register_File = "I2CDevice_default.ini"
+#Register_File = "I2CDevice_INA226.ini"
 
 class OtherException(Exception):
     pass
@@ -92,13 +92,9 @@ class I2C_register(tk.LabelFrame):
             self.read_str.set("0x{:04x}".format(default_val))
         read_label = tk.Label(self, textvariable = self.read_str)
         read_label.pack( side = 'left')
-        
-        if(self.word_num == 1):
-            self.sp1 = HexSpinboxChar(self,width=10)
-            self.sp1.set(0x00)
-        else:
-            self.sp1 = HexSpinboxWord(self,width=10)
-            self.sp1.set(0x0000)
+
+        self.sp1 = HexSpinbox(self, bytenum=self.word_num, width=10)
+        self.sp1.set(0)        
 
         self.sp1.pack(fill = 'x', padx=5, side = 'left')
 
@@ -145,6 +141,12 @@ class I2C_register(tk.LabelFrame):
             
     def writeSet(self, val):
         print("set write")
+
+    def save(self):
+        save_txt = ""
+        save_txt += str(self.addr)
+        write_txt = self.sp1.get()
+        return 
 
 class Control_Frame(tk.LabelFrame):
     def __init__(self, master):

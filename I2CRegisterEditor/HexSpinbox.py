@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @file HexSpinbox.py
-@version 1.0
+@version 1.1
 @author NSugi
 @date 07/07/2020
 @brief 
@@ -46,7 +46,27 @@ class HexSpinboxWord(tk.Spinbox):
     def cange(self):
         val = super().get()
         self.set(val)
+
+#Multi Byte 
+class HexSpinbox(tk.Spinbox):
+    def __init__(self, *args, **kwargs):
+        self.var = tk.StringVar()
+        self.bytenum = kwargs.pop('bytenum')
+        max_val = 0x1<<(self.bytenum*8)
+        super().__init__(*args, **kwargs, textvariable=self.var, from_=0,to=max_val,
+                         increment=1, command=self.cange )
+
+    def set(self, val):
+        s = "0x{:0%dx}" % (self.bytenum*2)
+        self.var.set(s.format(int(val)))
         
+    def get(self):
+        hstr = super().get()
+        return int(hstr, 16)
+
+    def cange(self):
+        val = super().get()
+        self.set(val)
 
 if __name__ == "__main__":
     print("HexSpinbox")
@@ -58,15 +78,16 @@ if __name__ == "__main__":
 
     hsp = HexSpinboxChar(win)
     hsp.set(0x55)
-    print(hsp.get())
     hsp.pack()
 
     hwsp = HexSpinboxWord(win)
     hwsp.set(0xAAAA)
-    print(hwsp.get())
     hwsp.pack()
-    
 
+    h4 = HexSpinbox(win, bytenum=2)
+    h4.set(0xAA55)
+    h4.pack()
+    
     win.geometry("200x200")
     win.title("HexSpinbox test")
     win.mainloop()

@@ -9,7 +9,8 @@ ArduinoをAardvarkのようなI2CとPythonのインターフェースとして�
 4. Ardipy_ADGraph.py       Ardipy : Python3サンプルソフト( ADC Graph viewer )  (動作確認用 (ADC1, ADC2のみチェック)
 5. Ardipy_PortControler.py Ardipy : Python3サンプルソフト( Port Controler )  [準備中]
 6. Ardipy_PWMEditor.py Ardipy     : Python3サンプルソフト( PWMEditor )  [準備中]
-7. Ardipy_Sequencer.py Ardipy     : Python3サンプルソフト( Arduino Sequencer )  [準備中]
+7. Ardipy_I2Craph.py       Ardipy : Python3サンプルソフト( I2C Registor Graph viewer )  [準備中]
+8. Ardipy_Sequencer.py Ardipy     : Python3サンプルソフト( Arduino Sequencer )  [準備中]
 
 ---GUI付属部品--- <BR>
 HexSpinbox (Tkinter用 hex spinbox) <BR>

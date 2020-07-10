@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @file Ardipy_ADGraph.py
-@version 1.0
+@version 1.1
 @author NomiSugi
 @date 07/6/2020
 @brief 
@@ -19,12 +19,16 @@ import time
 import tkinter as tk
 sys.path.append('../')
 from Ardipy_Driver import Ardipy
+sys.path.append('../Tool')
+from IOLogWindow import *
 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 import matplotlib.animation as animation
 import numpy as np
+
+PlotNum = 80
 
 Ardipy_ADGraph = "1.0"
 Initial_File = "ADCGraph.ini"
@@ -39,8 +43,8 @@ class GraphWindow(tk.LabelFrame):
         fig = Figure(figsize=(10.0, 8.0))  #graph size
         canvas = FigureCanvasTkAgg(fig, master=master) 
         self.x = np.arange(0, 40, 0.5)  # x軸(固定の値)
-        self.y1 = np.zeros(80)
-        self.y2 = np.zeros(80)
+        self.y1 = np.zeros(PlotNum)
+        self.y2 = np.zeros(PlotNum)
         self.l = np.arange(0, 5, 0.1)   # 表示期間(FuncAnimationで指定する関数の引数になる)
         plt = fig.add_subplot(111)
         plt.set_position([0.07,0.05,0.9,0.9])
@@ -53,17 +57,17 @@ class GraphWindow(tk.LabelFrame):
         canvas.get_tk_widget().pack()
 
         #補助線
-        plt.hlines([0], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([0.5], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)        
-        plt.hlines([1], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([1.5], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
-        plt.hlines([2], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
+        plt.hlines([0], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
+        plt.hlines([0.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)        
+        plt.hlines([1], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
+        plt.hlines([1.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
+        plt.hlines([2], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
         plt.hlines([2.5], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
-        plt.hlines([3], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([3.5], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
-        plt.hlines([4], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([4.5], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
-        plt.hlines([5], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)                        
+        plt.hlines([3], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
+        plt.hlines([3.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
+        plt.hlines([4], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
+        plt.hlines([4.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
+        plt.hlines([5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)                        
 
     def animate(self, i):
         self.line1.set_ydata(self.y1)  # update the data.
@@ -76,10 +80,14 @@ class GraphWindow(tk.LabelFrame):
         return self.line1,
 
     def setValues(self, y1, y2):
-        self.y1 = np.append(self.y1, y1)
-        self.y1 = np.delete(self.y1, 0)
-        self.y2 = np.append(self.y2, y2)
-        self.y2 = np.delete(self.y2, 0)
+        self.y1 = np.insert(self.y1, 0, y1)
+        self.y1 = np.delete(self.y1, PlotNum)
+        self.y2 = np.insert(self.y2, 0, y2)
+        self.y2 = np.delete(self.y2, PlotNum)
+#        self.y1 = np.append(self.y1, y1)
+#        self.y1 = np.delete(self.y1, 0)
+#        self.y2 = np.append(self.y2, y2)
+#        self.y2 = np.delete(self.y2, 0)
     
 
 class Control_Frame(tk.LabelFrame):
@@ -88,6 +96,22 @@ class Control_Frame(tk.LabelFrame):
         log = ''
         self.ardipy = Ardipy(log)
 
+        #LogWindow
+        self.log_win = tk.Toplevel()
+        self.log = IOLogFrame(self.log_win)
+        self.log_win.withdraw()
+        def on_closing():
+            self.log_win.withdraw()
+        self.log_win.protocol("WM_DELETE_WINDOW", on_closing)
+
+        #Menu Bar
+        menubar = tk.Menu(master)
+        master.configure(menu = menubar)
+        helps = tk.Menu(menubar, tearoff = False)
+        def open_log():
+            self.log_win.deiconify()
+        menubar.add_command(label='LogWindow', command=open_log)
+        
         #Arduino Control
         arduino_frame = tk.LabelFrame(master, text= "Arduino",relief = 'groove')
         arduino_txt = tk.Entry(arduino_frame)

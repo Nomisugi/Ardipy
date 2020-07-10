@@ -41,7 +41,9 @@ class GraphWindow(tk.LabelFrame):
         super().__init__(master,relief='ridge')
         self.pack()
         fig = Figure(figsize=(10.0, 8.0))  #graph size
-        canvas = FigureCanvasTkAgg(fig, master=master) 
+        canvas = FigureCanvasTkAgg(fig, master=master)
+        self.run_flag = False
+        self.view_flags = [True,True,True,True,True,True,True,True]
         self.x = np.arange(0, 40, 0.5)  # x軸(固定の値)
         self.y1 = np.zeros(PlotNum)
         self.y2 = np.zeros(PlotNum)
@@ -54,24 +56,20 @@ class GraphWindow(tk.LabelFrame):
         )
         self.line1, = plt.plot(self.y1)
         self.line2, = plt.plot(self.y1)
+        self.line1.visible = False
         canvas.get_tk_widget().pack()
 
         #補助線
-        plt.hlines([0], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([0.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)        
-        plt.hlines([1], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([1.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
-        plt.hlines([2], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([2.5], 0, 80, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
-        plt.hlines([3], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([3.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
-        plt.hlines([4], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
-        plt.hlines([4.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)                
-        plt.hlines([5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)                        
-
+        for i in range(6):
+            plt.hlines([i], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.5)
+            plt.hlines([i+0.5], 0, PlotNum, "blue", linestyles='dashed',linewidth = 0.5, alpha = 0.2)
+        
     def animate(self, i):
-        self.line1.set_ydata(self.y1)  # update the data.
-        self.line2.set_ydata(self.y2)  # update the data.        
+        if self.run_flag:
+            self.line1.set_ydata(self.y1)  # update the data.
+            self.line2.set_ydata(self.y2)  # update the data.
+        else:
+            self.line1.visible = False
         return self.line1, self.line2,
 
     def init(self):  # only required for blitting to give a clean slate.
@@ -84,11 +82,21 @@ class GraphWindow(tk.LabelFrame):
         self.y1 = np.delete(self.y1, PlotNum)
         self.y2 = np.insert(self.y2, 0, y2)
         self.y2 = np.delete(self.y2, PlotNum)
-#        self.y1 = np.append(self.y1, y1)
-#        self.y1 = np.delete(self.y1, 0)
-#        self.y2 = np.append(self.y2, y2)
-#        self.y2 = np.delete(self.y2, 0)
-    
+
+    def start(self):
+        if self.run_flag:
+            self.run_flag = False
+        else:
+            self.run_flag = True
+
+    def view(self, num):
+        print(num)
+        if self.view_flags[num]:
+            self.view_flags[num] = False
+            self.line1.visible = False
+        else:
+            self.view_flags[num] = True
+            self.line1.visible = False
 
 class Control_Frame(tk.LabelFrame):
     def __init__(self, master):
@@ -134,7 +142,16 @@ class Control_Frame(tk.LabelFrame):
             arduino_txt.insert(0, "disconnect")
         disconnect_button = tk.Button(arduino_frame, text="Disconnect", command=disconnect_on_click)
         disconnect_button.pack(side = 'left')
-        
+
+        #Control Frame
+        control_frame = tk.LabelFrame(master, text= "Control",relief = 'groove')
+        start_button = tk.Button(control_frame, text="START/STOP", command=lambda:self.graph.start())
+        start_button.pack(side = 'left')
+        control_frame.pack(side = 'top', fill = 'x')
+#        sc1 = SimpleCheck(control_frame, text="AD0", flag=True,
+#                        command=lambda:self.graph.view(0))
+#        sc1.pack(side = 'left')
+
         self.graph = GraphWindow(master)
         self.update()
 
@@ -143,6 +160,7 @@ class Control_Frame(tk.LabelFrame):
             self.graph.setValues((self.ardipy.adRead(0) * (5/1024)),
                                  (self.ardipy.adRead(1))* (5/1024))
         self.master.after(50, self.update)
+
     
 
 if __name__ == "__main__":

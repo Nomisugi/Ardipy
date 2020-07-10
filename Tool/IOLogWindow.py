@@ -27,9 +27,13 @@ TEXT_COLORS = {
     'DEBUG' : 'yellow'    
     }
 
+# Initial value = flag=True or False
 class SimpleCheck(tk.Checkbutton):
     def __init__(self, parent, *args, **kw):
+        self.flag = kw.pop('flag')
         self.var =  tk.BooleanVar()
+        if self.flag:
+            self.var.set(True)
         self.txt = kw["text"]
         tk.Checkbutton.__init__(self, parent, *args, **kw, variable=self.var)
 
@@ -58,7 +62,7 @@ class IOLogFrame(tk.Frame):
 
         self.ckboxs = []
         for key in TEXT_COLORS:
-            cb = SimpleCheck(select_frame, text=key, command=self.callback)
+            cb = SimpleCheck(select_frame, text=key, command=self.callback, flag=False)
             self.ckboxs.append(cb)
             cb.pack(side='left')
         select_frame.pack(side = 'top', fill = 'x')

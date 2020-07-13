@@ -40,18 +40,6 @@ class SimpleCheck(tk.Checkbutton):
     def get(self):
         return self.var.get()
 
-
-class IOLogWindow(tk.Toplevel):
-    def __init__(self, master):    
-        tk.Toplevel.__init__(self, master)
-        io = IOLogFrame(self)
-        io.print("Message")
-        io.print("--ERROR--", 'ERROR')
-        io.print("--INPUT--", 'INPUT')
-        io.print("--OUTPUT--", 'OUTPUT')
-        io.print("消えたり消えなかったり")    
-
-
 class IOLogFrame(tk.Frame):
     def __init__(self, master):    
         tk.Frame.__init__(self, master)
@@ -90,7 +78,18 @@ class IOLogFrame(tk.Frame):
     def view(self, tag):
         self.txt.tag_config(tag, elide=False)
 
-
+#sample main window
+class IOLogWindow(tk.Toplevel):
+    def __init__(self, master):
+        master.title("Main WIndow")
+        tk.Toplevel.__init__(self, master)
+        io = IOLogFrame(self)
+        io.print("Message")
+        io.print("--ERROR--", 'ERROR')
+        io.print("--INPUT--", 'INPUT')
+        io.print("--OUTPUT--", 'OUTPUT')
+        io.print("--DEBUG--", 'DEBUG')    
+        
 if __name__ == '__main__':
     win = tk.Tk()
     io=IOLogWindow(win)

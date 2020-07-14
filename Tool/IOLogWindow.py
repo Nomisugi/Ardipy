@@ -71,12 +71,20 @@ class IOLogFrame(tk.Frame):
 
     def print(self, str, state='MESSAGE'):
         self.txt.insert(tk.END, str+'\n', state)
+        self.txt.see(tk.END)
 
     def hide(self, tag):
         self.txt.tag_config(tag, elide=True)
 
     def view(self, tag):
         self.txt.tag_config(tag, elide=False)
+
+    def write(self, str, state='MESSAGE'):
+        self.txt.insert(tk.END, str+'\n', state)
+        self.txt.see(tk.END)
+
+    def flush(self):
+        pass
 
 #sample main window
 class IOLogWindow(tk.Toplevel):

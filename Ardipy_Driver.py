@@ -28,7 +28,7 @@ class ConnectException(Exception):
     pass
 
 class Ardipy:
-    def __init__(self, log):
+    def __init__(self, log = None):
         self.log = log
         self.ser = serial.Serial()
         self.ser.baudrate = 921600
@@ -77,6 +77,7 @@ class Ardipy:
         
     def i2cWrite(self, slave_addr, addr, val):
         data = "I2W:%02x:%02x:%02x:1!" % (slave_addr, addr, val)
+        self.log.print(data, 'OUTPUT')
         self.ser.write(str.encode(data))
         str = self.ser.read(5)
         if( str.decode('utf-8') != '----!'):
@@ -92,11 +93,12 @@ class Ardipy:
         if n: data = data + self.ser.read(n)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
+        self.log.print(data3, 'INPUT')        
         return int(data3, 16)
 
     def i2cWrite_word(self, slave_addr, addr, val):
         data = "I2W:%02x:%02x:%02x:2!" % (slave_addr, addr, val)
-        print(data)
+        self.log.print(data, 'OUTPUT')
         self.ser.write(str.encode(data))
         data = self.ser.read(1)
         n = self.ser.inWaiting()
@@ -113,6 +115,7 @@ class Ardipy:
         if n: data = data + self.ser.read(n)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
+        self.log.print(data3, 'INPUT')        
         return int(data3, 16)
 
     def adRead(self, port_num):

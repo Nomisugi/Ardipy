@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 @file Ardipy_I2CRegister.py
-@version 1.1
+@version 1.2
 @author NomiSugi
-@date 07/1/2020
+@date 07/14/2020
 @brief 
 @details Ardipy用 Ardino I2C Register viewer(GUI:Tkinter)
 @warning 
@@ -21,6 +21,9 @@ sys.path.append('../')
 from Ardipy_Driver import Ardipy
 from HexSpinbox import *
 
+sys.path.append('../Tool')
+from IOLogWindow import *
+
 Ardipy_I2CRegister = "1.0"
 Register_File = "I2CDevice_default.ini"
 #Register_File = "I2CDevice_INA226.ini"
@@ -36,8 +39,8 @@ class VerticalScrolledFrame(tk.Frame):
     * This frame only allows vertical scrolling
 
     """
-    def __init__(self, parent, *args, **kw):
-        tk.Frame.__init__(self, parent, *args, **kw)            
+    def __init__(self, master, *args, **kw):
+        tk.Frame.__init__(self, master, *args, **kw)        
 
         # スクロールバーの作成
         vscrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
@@ -151,9 +154,28 @@ class I2C_register(tk.LabelFrame):
 class Control_Frame(tk.LabelFrame):
     def __init__(self, master):
         super().__init__(master, relief='ridge')
-        log = ''
-        self.ardipy = Ardipy(log)
 
+
+        #LogWindow
+        self.log_win = tk.Toplevel()
+        self.log = IOLogFrame(self.log_win)
+        self.log_win.withdraw()
+        def on_closing():
+            self.log_win.withdraw()
+        self.log_win.protocol("WM_DELETE_WINDOW", on_closing)
+
+        sys.stdout=self.log
+
+        self.ardipy = Ardipy(self.log)
+
+        #Menu Bar
+        menubar = tk.Menu(master)
+        master.configure(menu = menubar)
+        helps = tk.Menu(menubar, tearoff = False)
+        def open_log():
+            self.log_win.deiconify()
+        menubar.add_command(label='LogWindow', command=open_log)
+        
         #Arduino Control
         arduino_frame = tk.LabelFrame(master, text= "Arduino",relief = 'groove')
         arduino_txt = tk.Entry(arduino_frame)

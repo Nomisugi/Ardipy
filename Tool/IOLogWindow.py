@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 @file IOLogWindows.py
-@version 1.0
+@version 1.1
 @author NSugi
-@date 07/09/2020
+@date 07/15/2020
 @brief 
 @details Tkinter:Input/Outpu用 Logwindow
 @warning 
@@ -30,11 +30,11 @@ TEXT_COLORS = {
 # Initial value = flag=True or False
 class SimpleCheck(tk.Checkbutton):
     def __init__(self, parent, *args, **kw):
-        self.flag = kw.pop('flag')
+        self.flag = kw.pop('flag') if('flag' in kw) else False
+        self.txt = kw["text"]      if('text' in kw) else ""
         self.var =  tk.BooleanVar()
         if self.flag:
             self.var.set(True)
-        self.txt = kw["text"]
         tk.Checkbutton.__init__(self, parent, *args, **kw, variable=self.var)
 
     def get(self):

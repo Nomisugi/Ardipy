@@ -66,7 +66,6 @@ class Ardipy:
             raise ConnectException()
         self.connect_flag = True
 
-
     def disconnect(self):
         self.ser.close()
         self.connect_flag = False
@@ -79,43 +78,42 @@ class Ardipy:
         data = "I2W:%02x:%02x:%02x:1!" % (slave_addr, addr, val)
         self.log.print(data, 'OUTPUT')
         self.ser.write(str.encode(data))
-        str = self.ser.read(5)
-        if( str.decode('utf-8') != '----!'):
+        data = self.ser.read(5)
+        self.log.print(data, 'INPUT')
+        if( data.decode('utf-8') != '----!'):
             return True
         else:
             return False
 
     def i2cRead(self, slave_addr, addr):
         data = "I2R:%02x:%02x:1!" % (slave_addr, addr)
+        self.log.print(data, 'OUTPUT')        
         self.ser.write(str.encode(data))
-        data = self.ser.read(1)
-        n = self.ser.inWaiting()
-        if n: data = data + self.ser.read(n)
+        data = self.ser.read(5)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
-        self.log.print(data3, 'INPUT')        
+        self.log.print(data, 'INPUT')        
         return int(data3, 16)
 
     def i2cWrite_word(self, slave_addr, addr, val):
         data = "I2W:%02x:%02x:%02x:2!" % (slave_addr, addr, val)
         self.log.print(data, 'OUTPUT')
         self.ser.write(str.encode(data))
-        data = self.ser.read(1)
-        n = self.ser.inWaiting()
-        if n: data = data + self.ser.read(n)
-        data2 = data.decode('utf-8')
-        print(data2)
-        
+        data = self.ser.read(5)
+        self.log.print(data, 'INPUT')
+        if( data.decode('utf-8') != '----!'):
+            return True
+        else:
+            return False
 
     def i2cRead_word(self, slave_addr, addr):
         data = "I2R:%02x:%02x:2!" % (slave_addr, addr)
+        self.log.print(data, 'OUTPUT')        
         self.ser.write(str.encode(data))
-        data = self.ser.read(1)
-        n = self.ser.inWaiting()
-        if n: data = data + self.ser.read(n)
+        data = self.ser.read(5)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
-        self.log.print(data3, 'INPUT')        
+        self.log.print(data, 'INPUT')   
         return int(data3, 16)
 
     def adRead(self, port_num):

@@ -92,7 +92,7 @@ class Ardipy:
         data = self.ser.read(5)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
-        self.log.print(data, 'INPUT')        
+        self.log.print(data2, 'INPUT')        
         return int(data3, 16)
 
     def i2cWrite_word(self, slave_addr, addr, val):
@@ -113,7 +113,7 @@ class Ardipy:
         data = self.ser.read(5)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
-        self.log.print(data, 'INPUT')   
+        self.log.print(data2, 'INPUT')   
         return int(data3, 16)
 
     def adRead(self, port_num):
@@ -150,7 +150,7 @@ class Ardipy:
         data = self.ser.read(5)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
-        self.log.print(data, 'INPUT')   
+        self.log.print(data2, 'INPUT')   
                 
     def portIn_bit(self, port_id):
         data = "POR:%02x!" % (port_id)
@@ -159,7 +159,7 @@ class Ardipy:
         data = self.ser.read(5)
         data2 = data.decode('utf-8')
         data3 = data2.replace('!', '')
-        self.log.print(data, 'INPUT')   
+        self.log.print(data2, 'INPUT')   
         return int(data3, 16)
 
 
@@ -170,10 +170,18 @@ class Ardipy:
             if( d == '!'):
                 return s
             s += d
+
+class LogTest():
+    def __init__(self):
+        pass
+
+    def print(self, str, state='MESSAGE'):
+        print( state + ":" + str)
         
+            
 if __name__ == "__main__":
     print("Arduino Driver Test")
-    log = ""
+    log = LogTest()
     ar = Ardipy(log)
     ar.autoConnect()
 
@@ -185,5 +193,11 @@ if __name__ == "__main__":
     #AD Check
     val = ar.adRead(0x00)
     print(val)
+
+    #Port Check
+    ar.portOut_bit(2, 1)
+    i = ar.portIn_bit(3)
+    print(i)
+
         
             

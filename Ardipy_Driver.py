@@ -3,7 +3,7 @@
 @file Arduino_Driver01.py
 @version 1.1
 @author NSugi
-@date 06/26/2020
+@date 11/02/2021
 @brief 
 @details ArduinoとPythonの簡易接続用ドライバ
 @warning 
@@ -141,10 +141,27 @@ class Ardipy:
 
     def isConnect(self):
         return self.connect_flag
-                
 
-    def test(self):
-        print("test")
+    
+    def portOut_bit(self, port_id, data):
+        data = "POW:%02x:%01x!" % (port_id, data)
+        self.log.print(data, 'OUTPUT')        
+        self.ser.write(str.encode(data))
+        data = self.ser.read(5)
+        data2 = data.decode('utf-8')
+        data3 = data2.replace('!', '')
+        self.log.print(data, 'INPUT')   
+                
+    def portIn_bit(self, port_id):
+        data = "POR:%02x!" % (port_id)
+        self.log.print(data, 'OUTPUT')        
+        self.ser.write(str.encode(data))
+        data = self.ser.read(5)
+        data2 = data.decode('utf-8')
+        data3 = data2.replace('!', '')
+        self.log.print(data, 'INPUT')   
+        return int(data3, 16)
+
 
     def readline(self):
         s = ''

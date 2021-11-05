@@ -29,13 +29,14 @@ class ConnectException(Exception):
 
 class Ardipy:
     def __init__(self, log = None):
-        self.log = log
+        if(log == None):
+            self.log = LogTest()
+        else:
+            self.log = log
         self.ser = serial.Serial()
         self.ser.baudrate = 921600
         self.connect_flag = False
-    #==========================================================================
-    # MAIN PROGRAM
-    #==========================================================================
+
     def autoConnect(self):
         for i in range(100):
             com_str = 'COM%d'%i
@@ -181,8 +182,7 @@ class LogTest():
             
 if __name__ == "__main__":
     print("Arduino Driver Test")
-    log = LogTest()
-    ar = Ardipy(log)
+    ar = Ardipy()
     ar.autoConnect()
 
     #I2C Check( for INA226)
@@ -195,9 +195,21 @@ if __name__ == "__main__":
     print(val)
 
     #Port Check
-    ar.portOut_bit(2, 1)
+    light = True
+    
+    ar.portOut_bit(2, 0)
     i = ar.portIn_bit(3)
     print(i)
+
+    for j in range(10):
+        light = not light
+        if( light ):
+            ar.portOut_bit(2, 1)
+        else:
+            ar.portOut_bit(2, 0)
+        time.sleep(1)
+        print(".")
+        
 
         
             

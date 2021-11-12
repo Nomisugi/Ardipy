@@ -55,8 +55,9 @@ class Control_Frame(Ardipy_Frame):
         menubar.add_command(label='LogWindow', command=open_log)
         
         #Control Frame
+        self.run_flag = True
         control_frame = tk.LabelFrame(master, text= "Control",relief = 'groove')
-        start_button = tk.Button(control_frame, text="START/STOP", command=lambda:self.graph.start())
+        start_button = tk.Button(control_frame, text="START/STOP", command=self.start)
         start_button.pack(side = 'left')
         control_frame.pack(side = 'top', fill = 'x')
 
@@ -64,11 +65,19 @@ class Control_Frame(Ardipy_Frame):
         graph_frame = ttk.Frame(master)
         self.gf = SelectableGraph(graph_frame, graph_list)
         graph_frame.pack(side = 'right', fill = 'both')
+        self.gf.setGraph_Y_Range(-1, 6)
         self.update()
 
+    def start(self):
+        self.run_flag = not self.run_flag
+        if( self.run_flag ):
+            self.gf.start()
+        else:
+            self.gf.stop()
+            
     def update(self):
         vals = []
-        if self.ardipy.isConnect():
+        if (self.ardipy.isConnect() & self.run_flag):
             vals.append(self.ardipy.adRead(0) * (5/1024))
             vals.append(self.ardipy.adRead(1) * (5/1024))
             vals.append(self.ardipy.adRead(2) * (5/1024))

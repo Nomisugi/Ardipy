@@ -12,12 +12,13 @@ class GraphFrame(ttk.Frame):
     def __init__(self, master, graph_num):
         super().__init__(master)
         #Graph view
+        self.plotnum = 500
         self.fig = Figure()
         canvas = FigureCanvasTkAgg(self.fig, master=master)
         self.x = np.arange(0, 10, 0.1)
         self.y_datas = []
         for y in range(graph_num):
-            self.y_datas.append( np.zeros(500) )
+            self.y_datas.append( np.zeros(self.plotnum) )
         l = np.arange(0, 10, 0.01)
         self.plt = self.fig.add_subplot(111)
         self.plt.set_ylim([-2, 2])
@@ -32,6 +33,7 @@ class GraphFrame(ttk.Frame):
                                       interval=self.interval, blit=True,
         )
         canvas.get_tk_widget().pack()
+        self.run_flag = True
 
     def animate(self, i):
         count = 0
@@ -47,14 +49,24 @@ class GraphFrame(ttk.Frame):
         self.fig.canvas.draw()
 
     def setGraph_X_Range(self, x):
+#        self.gf.setGraph_X_Range()                
         self.plt.set_position([0.07, 0.05, 0.9, 0.9])
-        self.plt.set_xlim([0, x])
+        self.plt.set_xlim([self.plotnum-x, self.plotnum])
         self.fig.canvas.draw()
         
     def setInterval(self, interval):
         print (interval)
         self.interval = interval
 
+    def start(self):
+        self.ani.event_source.start()
+
+    def stop(self):
+        self.ani.event_source.stop()
+
+    def graph_clear(self):
+        self.plt.cla()
+        self.plt.show()        
 
     def setValues(self, vals):
         count = 0
@@ -127,7 +139,27 @@ class SelectableGraph(ttk.Frame):
         self.gf.setGraph_Y_Range( int(self.y_max_text.get()), int(self.y_min_text.get()))
 
     def on_x_range_submit(self):
-        self.gf.setGraph_X_Range( int(self.x_text.get()) )
+        self.setGraph_X_Range( int(self.x_text.get()) )
+
+    def start(self):
+        self.gf.start()
+
+    def stop(self):
+        self.gf.stop()
+
+    def graph_clear(self):
+        self.gf.graph_clear()
+        
+
+    def setGraph_Y_Range(self, y_min, y_max):
+        self.y_max_text.set(str(y_max))
+        self.y_min_text.set(str(y_min))        
+        self.gf.setGraph_Y_Range(y_max, y_min)
+
+    def setGraph_X_Range(self, x):
+        self.gf.setGraph_X_Range(x)
+
+        
 
 
 class RealtimeUpdateGraph(ttk.Frame):

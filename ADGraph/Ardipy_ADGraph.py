@@ -21,7 +21,6 @@ import tkinter.ttk as ttk
 sys.path.append('../')
 from Ardipy_Driver import Ardipy
 sys.path.append('../Tool')
-from IOLogWindow import *
 from Ardipy_Frame  import Ardipy_Frame
 from SelectableGraph import *
 
@@ -38,22 +37,6 @@ class Control_Frame(Ardipy_Frame):
         self.ardipy = Ardipy(self.log)
         super().__init__(master, self.ardipy)
 
-        #LogWindow
-        self.log_win = tk.Toplevel()
-        self.log = IOLogFrame(self.log_win)
-        self.log_win.withdraw()
-        def on_closing():
-            self.log_win.withdraw()
-        self.log_win.protocol("WM_DELETE_WINDOW", on_closing)
-
-        #Menu Bar
-        menubar = tk.Menu(master)
-        master.configure(menu = menubar)
-        helps = tk.Menu(menubar, tearoff = False)
-        def open_log():
-            self.log_win.deiconify()
-        menubar.add_command(label='LogWindow', command=open_log)
-        
         #Control Frame
         self.run_flag = True
         control_frame = tk.LabelFrame(master, text= "Control",relief = 'groove')

@@ -11,8 +11,8 @@ The program structure is as follows
 1. Ardipy.ino                     : For Arudino UNO　 UART　Control 
 2. Ardipy_driver.py               : For Python3  (Connect to Arduino UNO)
 3. Ardipy_I2CRegister.py   Ardipy : Python3 Sample Soft( I2C Register Controler ) 
-4. Ardipy_ADGraph.py       Ardipy : Python3 Sample Soft( ADC Graph viewer )  (only ADC1, ADC2)
-5. Ardipy_PortControler.py Ardipy : Python3 Sample Soft( Port Controler )  [Preparing]
+4. Ardipy_ADGraph.py       Ardipy : Python3 Sample Soft( ADC Graph viewer )  (All ADCs)
+5. Ardipy_PortControler.py Ardipy : Python3 Sample Soft( Port Controler )  (All ports(ch2-ch9))
 6. Ardipy_PWMEditor.py Ardipy     : Python3 Sample Soft( PWMEditor )  [Preparing]
 7. Ardipy_I2Craph.py       Ardipy : Python3 Sample Soft( I2C Registor Graph viewer )  [Preparing]
 8. Ardipy_E2PROMEditor.py Ardipy  : Python3 Sample Soft( EEPROM ditor )  [Preparing]

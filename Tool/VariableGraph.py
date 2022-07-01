@@ -16,6 +16,7 @@ class GraphFrame(ttk.Frame):
         self.x = np.arange(0, 10, 0.1)
         self.y_datas = []
         for y in range(graph_num):
+            print(y)
             self.y_datas.append( np.zeros(100) )
         l = np.arange(0, 10, 0.01)
         plt = fig.add_subplot(111)

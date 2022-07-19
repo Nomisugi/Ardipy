@@ -37,6 +37,8 @@ class Ardipy:
         self.ser.baudrate = 921600
         self.connect_flag = False
 
+        self.version = ""
+
     def autoConnect(self):
         for i in range(100):
             com_str = 'COM%d'%i
@@ -129,10 +131,14 @@ class Ardipy:
         self.ser.write(str.encode('VER!'))
         data = self.ser.read(5)
         sdata = data.decode('utf-8')
+        self.version = sdata
 
         if(sdata.split('.')[0] != Arduino_FW_Version.split('.')[0] ):
             return False
         return True
+
+    def getVersion(self):
+        return self.version
         
     def sleep(self, ms):
         time.sleep(ms)

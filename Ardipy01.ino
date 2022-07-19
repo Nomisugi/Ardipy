@@ -4,7 +4,7 @@
 //#define BAUDRATE 9600
 #define BAUDRATE 921600
 
-const char* Version = "1.0!!"; //5 charactor
+const char* Version = "1.1!!"; //5 charactor
 
 void debug_print(char* data)
 {
@@ -168,7 +168,6 @@ void loop() {
          Serial.print(rets);
       }
       else if(strcmp( str[0], "ADR")==0){
-         pinMode(atoi16(str[1]), INPUT);
          word retw = analogRead(atoi16(str[1]));
          sprintf(rets, "%03x!!", retw); 
          Serial.print(rets);

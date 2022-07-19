@@ -23,7 +23,7 @@ class Ardipy_Frame(ttk.LabelFrame):
             try:
                 str = self.ardipy.autoConnect()
             except:
-                print("connect error")
+                tk.messagebox.showerror("Device Not Found", "Please connected to Arduino UNO board and writing Ardipy.uno")
             arduino_txt.delete(0, tk.END)
             arduino_txt.insert(0, "connect:"+str)
             self.ardipy.reset()

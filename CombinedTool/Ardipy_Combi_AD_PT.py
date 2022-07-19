@@ -49,7 +49,8 @@ class Combi_Frame(Ardipy_Frame):
         super().__init__(master, self.ardipy)
 
         def onVersion():
-            tk.messagebox.showinfo("Version", Ardipy_Combi_Ver)
+            ver = self.ardipy.getVersion()
+            tk.messagebox.showinfo("Version", Ardipy_Combi_Ver + "\nArduino Uno:" + ver)
 
         def onLogWindow():
             self.log_win.deiconify()

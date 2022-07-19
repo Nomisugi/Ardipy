@@ -17,16 +17,18 @@ import binascii
 import re
 import time
 import tkinter as tk
+from tkinter import filedialog
+
 sys.path.append('../')
 from Ardipy_Driver import Ardipy
 from HexSpinbox import *
 
 sys.path.append('../Tool')
 from IOLogWindow import *
+from Ardipy_Frame  import Ardipy_Frame
 
-Ardipy_I2CRegister = "1.0"
-Register_File = "I2CDevice_default.ini"
-#Register_File = "I2CDevice_INA226.ini"
+Ardipy_I2CRegister = "1.1"
+Register_File = "I2CDevice_sample.ini"
 
 class OtherException(Exception):
     pass
@@ -151,11 +153,104 @@ class I2C_register(tk.LabelFrame):
         write_txt = self.sp1.get()
         return 
 
-class Control_Frame(tk.LabelFrame):
-    def __init__(self, master):
+class I2CRegister_Frame(tk.LabelFrame):
+    def __init__(self, master, ardipy):
         super().__init__(master, relief='ridge')
 
+        self.ardipy = ardipy
 
+        def open_file_command(edit_box, file_type_list):
+            file_path = filedialog.askopenfilename(filetypes = file_type_list)
+            edit_box.delete(0, tk.END)
+            edit_box.insert(tk.END, file_path)
+            reflesh(file_path)
+        
+        file_frame = tk.LabelFrame(master, text= "I2C Device file",relief = 'groove')
+        tk.Label(file_frame, text = "I2C File").pack(side = tk.LEFT)
+        file_name = tk.StringVar()
+        file_name.set(Register_File)
+        file_frame.edit_box = tk.Entry(file_frame, width = 50, textvariable = file_name)
+        file_frame.edit_box.pack(side = tk.LEFT)
+        file_button = tk.Button(file_frame, text = 'Open', width = 5, command = lambda:open_file_command(file_frame.edit_box, [('TEXT file', '*.ini')]))
+        file_button.pack(side = tk.LEFT)
+        file_frame.pack(side = 'top', fill = 'x')
+
+        slave_str = ''
+        self.slave_addr = 0
+
+        self.regs_gui = []
+        self.scroll_frame = VerticalScrolledFrame(master)
+
+        #Slave Address
+        slave_frame = tk.LabelFrame(master, text= "Slave Address",relief = 'groove')
+        slave_txt = tk.Entry(slave_frame, textvariable="0x00")
+        slave_txt.pack(side='left')
+        slave_frame.pack(side = 'top', fill = 'x')
+
+        note_frame = tk.Frame(master)
+        note_frame.pack(fill = 'x')
+        note = tk.Label(note_frame, text ="  Addr  Read         Write                                     note")
+        note.pack(side='left')
+        
+        def reflesh(file):
+            #Register Data Read
+            for reg in self.regs_gui:
+                reg.destroy()
+            self.regs_gui.clear()
+            self.scroll_frame.destroy()
+            self.scroll_frame = VerticalScrolledFrame(master)
+            
+            regs_datas = []
+            regs_count = 0
+            rf=open(file, 'r')
+            for line in rf:
+                line = line.replace('\n','')
+                ar = line.split(',')
+                if re.match('^SLAVE', line):
+                    slave_str = ar[1]
+                    self.slave_addr = int(slave_str, 16)
+                    continue
+                if re.match('^REG', line):
+                    regs_datas.append(line);continue
+                else:
+                    continue
+
+            for reg in regs_datas:
+                r = reg.split(',')
+                print(r)
+                i2c = I2C_register(self.scroll_frame.interior, self.ardipy,
+                                   self.slave_addr, int(r[1],16),
+                                   int(r[2],16), int(r[3],16),r[4], r[5])
+                i2c.pack(side = 'top', fill = 'x')
+                self.regs_gui.append(i2c)
+            slave_txt.delete(0, tk.END)
+            slave_txt.insert(0, "0x{:02x}".format(self.slave_addr))
+            self.scroll_frame.pack(side='top', fill = tk.BOTH)
+        reflesh(Register_File)
+
+    def all_read_on_click():
+        #Registers
+        self.all_read.state = "disable"
+        for regg in self.regs_gui:
+            regg.read()
+        self.all_read.state = "enable"
+            
+        self.all_read = tk.Button(slave_frame, text="All Read", command=all_read_on_click)
+        self.all_read.pack(side = 'left')
+        all_write = tk.Button(slave_frame, text="All Write")        
+        all_write.pack(side = 'left')
+
+        for regg in self.regs_gui:
+            regg.pack(fill = 'x')
+
+    def I2C_read(self, addr):
+            return self.ardipy.i2cRead_word(slave_addr, addr)
+
+    def close(self, event):
+        print("close")
+
+class Control_Frame(Ardipy_Frame):
+    def __init__(self, master):
         #LogWindow
         self.log_win = tk.Toplevel()
         self.log = IOLogFrame(self.log_win)
@@ -164,8 +259,10 @@ class Control_Frame(tk.LabelFrame):
             self.log_win.withdraw()
         self.log_win.protocol("WM_DELETE_WINDOW", on_closing)
 
-        sys.stdout=self.log
+        self.ardipy = Ardipy(self.log)
+        super().__init__(master, self.ardipy)
 
+        sys.stdout=self.log
         self.ardipy = Ardipy(self.log)
 
         #Menu Bar
@@ -175,89 +272,10 @@ class Control_Frame(tk.LabelFrame):
         def open_log():
             self.log_win.deiconify()
         menubar.add_command(label='LogWindow', command=open_log)
-        
-        #Arduino Control
-        arduino_frame = tk.LabelFrame(master, text= "Arduino",relief = 'groove')
-        arduino_txt = tk.Entry(arduino_frame)
-        arduino_txt.insert(0, "disconnect")
-        arduino_txt.pack(side='left')
-        arduino_frame.pack(side = 'top', fill = 'x')
 
-        def connect_on_click():
-            try:
-                str = self.ardipy.autoConnect()
-            except:
-                print("connect error")
-            arduino_txt.delete(0, tk.END)
-            arduino_txt.insert(0, "connect:"+str)
-            self.ardipy.reset()
-        connect_button = tk.Button(arduino_frame, text="Connect", command=connect_on_click)
-        connect_button.pack(side = 'left')
-        def disconnect_on_click():
-            self.ardipy.disconnect()
-            arduino_txt.delete(0, tk.END)                
-            arduino_txt.insert(0, "disconnect")
-        disconnect_button = tk.Button(arduino_frame, text="Disconnect", command=disconnect_on_click)
-        disconnect_button.pack(side = 'left')
-        
-        #Register Data Read
-        slave_str = ''
-        self.slave_addr = 0
-        regs_datas = []
-        regs_gui = []
-        regs_count = 0
-        rf=open(Register_File, 'r')
-        for line in rf:
-            line = line.replace('\n','')
-            ar = line.split(',')
-            if re.match('^SLAVE', line):
-                slave_str = ar[1]
-                self.slave_addr = int(slave_str, 16)
-                continue
-            if re.match('^REG', line):
-                regs_datas.append(line);continue
-            else:
-                continue
+        i2c_frame = I2CRegister_Frame(master, self.ardipy)
+        i2c_frame.pack(side = 'top', fill = 'x')        
 
-        #Slave Address
-        slave_frame = tk.LabelFrame(master, text= "Slave Address",relief = 'groove')
-        slave_txt = tk.Entry(slave_frame, textvariable="0x00")
-        slave_txt.insert(0, slave_str)
-        slave_txt.pack(side='left')
-        slave_frame.pack(side = 'top', fill = 'x')
-
-        note_frame = tk.Frame(master)
-        note_frame.pack(fill = 'x')
-        note = tk.Label(note_frame, text ="  Addr  Read         Write                                     note")
-        note.pack(side='left')
-
-        self.scroll_frame = VerticalScrolledFrame(master)
-        for reg in regs_datas:
-            r = reg.split(',')
-            regs_gui.append(I2C_register(self.scroll_frame.interior, self.ardipy, self.slave_addr, int(r[1],16),
-                                int(r[2],16), int(r[3],16),r[4], r[5]))
-        self.scroll_frame.pack(side='top', fill = tk.BOTH)
-
-        def all_read_on_click():
-            #Registers
-            self.all_read.state = "disable"
-            for regg in regs_gui:
-                regg.read()
-            self.all_read.state = "enable"
-            
-        self.all_read = tk.Button(slave_frame, text="All Read", command=all_read_on_click)
-        self.all_read.pack(side = 'left')
-        all_write = tk.Button(slave_frame, text="All Write")        
-        all_write.pack(side = 'left')
-
-        for regg in regs_gui:
-            regg.pack(fill = 'x')
-
-    def I2C_read(self, addr):
-        return self.ardipy.i2cRead_word(slave_addr, addr)
-
-    def close(self, event):
-        print("close")
 
 if __name__ == "__main__":
     win = tk.Tk()

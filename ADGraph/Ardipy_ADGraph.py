@@ -31,18 +31,17 @@ Ardipy_ADGraph = "1.4"
 class AdgraphException(Exception):
     pass
 
-class Control_Frame(Ardipy_Frame):
-    def __init__(self, master):
-        self.log = None
-        self.ardipy = Ardipy(self.log)
-        self.collection_interval = 100
-        super().__init__(master, self.ardipy)
+class ADGraph_Frame(tk.Frame):
+    def __init__(self, master, ardipy):
+        super().__init__(master)
 
+        self.ardipy = ardipy
+        self.collection_interval = 100
         self.sw1 = StopWatch("sw1")        
         self.sw1.start()
         #Control Frame
         self.run_flag = True
-        control_frame = tk.LabelFrame(master, text= "Control",relief = 'groove')
+        control_frame = tk.LabelFrame(self, text= "Control",relief = 'groove')
         start_button = tk.Button(control_frame, text="START/STOP", command=self.start)
         start_button.pack(side = 'left')
         interval_label1 = tk.Label(control_frame, text=u'  Collection interval')
@@ -57,7 +56,7 @@ class Control_Frame(Ardipy_Frame):
         control_frame.pack(side = 'top', fill = 'x')
 
         graph_list = ["AD0", "AD1", "AD2", "AD3", "AD4", "AD5"]
-        graph_frame = ttk.Frame(master)
+        graph_frame = ttk.Frame(self)
         self.gf = SelectableGraph(graph_frame, graph_list)
         graph_frame.pack(side = 'right', fill = 'both')
         self.gf.setGraph_Y_Range(-1, 6)
@@ -80,7 +79,6 @@ class Control_Frame(Ardipy_Frame):
             self.gf.stop()
             
     def update(self):
-        print( datetime.datetime.now() )
         before_time  = self.sw1.stop()
         
         vals = []
@@ -98,7 +96,15 @@ class Control_Frame(Ardipy_Frame):
         interval = self.collection_interval - int(interval*1000)
         self.master.after(interval, self.update)
         return
-    
+
+class Control_Frame(Ardipy_Frame):
+    def __init__(self, master):
+        self.log = None
+        self.ardipy = Ardipy(self.log)
+        super().__init__(master, self.ardipy)
+
+        adgraph = ADGraph_Frame(master, self.ardipy)
+        adgraph.pack(side = 'top', fill = 'x')
 
 if __name__ == "__main__":
     win = tk.Tk()

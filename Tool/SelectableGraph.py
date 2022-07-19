@@ -55,7 +55,6 @@ class GraphFrame(ttk.Frame):
         self.fig.canvas.draw()
         
     def setInterval(self, interval):
-        print (interval)
         self.interval = interval
 
     def start(self):
@@ -81,15 +80,25 @@ class GraphFrame(ttk.Frame):
             self.lines[count].set_visible(opt.get())
             count+=1
 
+    def linetype(self, linetypes):
+        count = 0
+        for type in linetypes:
+            self.lines[count].set_linestyle(type)
+            count+=1
+
+    def set_yticks(self, yticks):
+        self.plt.set_yticklabels(yticks)
+            
+
 class SelectableGraph(ttk.Frame):
-    def __init__(self, master, graph_list):
+    def __init__(self, master, graph_list, yticks=0):
         super().__init__(master)
         self.pack()
 
         self.graph_num = len(graph_list)
 
         control_frame = ttk.Frame(self)
-        control_frame.pack(side = 'left', anchor = tk.N)        
+        control_frame.pack(side = 'left', anchor = tk.N)
 
         select_frame = ttk.LabelFrame(control_frame, text= "line Select",relief = 'groove')
         select_frame.pack(side = 'top', anchor = tk.N)
@@ -116,6 +125,7 @@ class SelectableGraph(ttk.Frame):
         ttk.Entry(interval_frame, textvariable=self.x_text, width=8).pack(side = 'left')
         self.x_text.set("100")
         ttk.Button(interval_frame, text = 'set', command=self.on_x_range_submit, width =5).pack()
+            
         
         
         def on_check():
@@ -132,8 +142,15 @@ class SelectableGraph(ttk.Frame):
         self.gf =GraphFrame(graph_frame, self.graph_num)
         graph_frame.pack(side = 'right', fill = 'x')
 
+        if(yticks != 0):
+            self.gf.set_yticks(yticks)
+        
+
     def setValues(self, vals):
         self.gf.setValues(vals)
+
+    def setLineType(self, types):
+        self.gf.linetype(types)
 
     def on_y_range_submit(self):
         self.gf.setGraph_Y_Range( int(self.y_max_text.get()), int(self.y_min_text.get()))

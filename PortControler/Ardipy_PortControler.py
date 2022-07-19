@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @file Ardipy_PortControl.py
-@version 1.0
+@version 1.2
 @author NomiSugi
 @date 6/30/2022
 @brief 
@@ -13,12 +13,14 @@
 # IMPORTS
 #==========================================================================
 import sys
+import os
 import binascii
 import re
 import time
 import tkinter as tk
 import tkinter.ttk as ttk
-sys.path.append('../')
+#sys.path.append('../')
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from Ardipy_Driver import Ardipy
 sys.path.append('../Tool')
 from Ardipy_Frame  import Ardipy_Frame
@@ -63,6 +65,7 @@ class PortControler(tk.Frame):
             btn = tk.Button(self.state_frame,text=i+"\nLOW", width=10,
                             relief='raised', command=self.callback_state(i))
             btn.pack(sid='left')
+            btn['state'] ='disabled'
             self.state_bits.append(btn)
         
         
